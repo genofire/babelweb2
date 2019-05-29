@@ -16,8 +16,9 @@ var (
 type Parser struct {
 	scanner *bufio.Scanner
 
-	router string
-	host   string
+	Router  string
+	Host    string
+	Version string
 
 	keywords map[string]keywordParser
 }
@@ -40,17 +41,18 @@ func NewParser(r io.Reader) *Parser {
 
 	return &Parser{
 		scanner: scanner,
-		router:  "",
-		host:    "unknown",
+		Router:  "",
+		Version: "unknown",
+		Host:    "unknown",
 		keywords: map[string]keywordParser{
 			"BABEL":     parseString,
 			"version":   parseString,
 			"host":      parseString,
 			"my-id":     parseString,
 			"up":        parseBool,
-			"ipv4":      parseIp,
-			"ipv6":      parseIp,
-			"address":   parseIp,
+			"ipv4":      parseIP,
+			"ipv6":      parseIP,
+			"address":   parseIP,
 			"if":        parseString,
 			"reach":     getUintParser(16, 16),
 			"rxcost":    getUintParser(10, 32),
@@ -63,7 +65,7 @@ func NewParser(r io.Reader) *Parser {
 			"id":        parseString,
 			"metric":    getUintParser(10, 32),
 			"refmetric": getUintParser(10, 32),
-			"via":       parseIp,
+			"via":       parseIP,
 		},
 	}
 }
@@ -87,7 +89,7 @@ func (p *Parser) Init() error {
 		}
 
 		data, err := parseData(p.scanner)
-		if err != nil && err != errEOL && (err != io.EOF || p.router == "") {
+		if err != nil && err != errEOL && (err != io.EOF || p.Router == "") {
 			return err
 		}
 
@@ -98,11 +100,15 @@ func (p *Parser) Init() error {
 			}
 		case "host":
 			if data != nil {
-				p.host = data.(string)
+				p.Host = data.(string)
+			}
+		case "version":
+			if data != nil {
+				p.Version = data.(string)
 			}
 		case "my-id":
 			if data != nil {
-				p.router = data.(string)
+				p.Router = data.(string)
 				return nil
 			}
 		}
@@ -153,8 +159,8 @@ func (p *Parser) Parse() (*Transition, error) {
 	}
 
 	return &Transition{
-		Router: p.router,
-		Host:   p.host,
+		Router: p.Router,
+		Host:   p.Host,
 		Action: action,
 		Table:  table,
 		Field:  field,
@@ -229,7 +235,7 @@ func getUintParser(base int, bitSize int) keywordParser {
 	}
 }
 
-func parseIp(s *bufio.Scanner) (interface{}, error) {
+func parseIP(s *bufio.Scanner) (interface{}, error) {
 	w, err := nextWord(s)
 	if err != nil {
 		return nil, err
