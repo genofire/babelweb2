@@ -41,9 +41,11 @@ func NewParser(r io.Reader) *Parser {
 
 	return &Parser{
 		scanner: scanner,
+
 		Router:  "",
-		Version: "unknown",
 		Host:    "unknown",
+		Version: "unknown",
+
 		keywords: map[string]keywordParser{
 			"BABEL":     parseString,
 			"version":   parseString,
