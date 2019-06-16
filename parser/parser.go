@@ -57,6 +57,8 @@ func NewParser(r io.Reader) *Parser {
 			"address":   parseIP,
 			"if":        parseString,
 			"reach":     getUintParser(16, 16),
+			"ureach":    getUintParser(16, 16),
+			"cost":      getUintParser(10, 32),
 			"rxcost":    getUintParser(10, 32),
 			"txcost":    getUintParser(10, 32),
 			"rtt":       parseString,
