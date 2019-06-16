@@ -151,7 +151,7 @@ func (p *Parser) Parse() (*Transition, error) {
 
 		dataParser, exists := p.keywords[keyword]
 		if !exists {
-			continue
+			dataParser = parseString
 		}
 
 		data[keyword], err = dataParser(p.scanner)
