@@ -250,7 +250,7 @@ func parseIP(s *bufio.Scanner) (interface{}, error) {
 		return nil, errors.New("Syntax Error: invalid IP address: " + w)
 	}
 
-	return w, nil
+	return ip, nil
 }
 
 func parsePrefix(s *bufio.Scanner) (interface{}, error) {
